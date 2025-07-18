@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import openai  # ✅ Correct import for openai>=1.x
+import openai
 from databricks import sql
 import plotly.express as px
 import plotly.graph_objects as go
@@ -12,7 +12,7 @@ HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
 # --- Set up OpenAI client ---
-openai.api_key = openai_api_key  # ✅ Correct way for v1.x
+openai.api_key = openai_api_key
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -117,17 +117,20 @@ tab1, tab2, tab3 = st.tabs(["Revenue by Department", "Fraud % by Region", "Month
 with tab1:
     dept_df = df.groupby("department")["revenue"].sum().reset_index().sort_values("revenue", ascending=False)
     fig = px.bar(dept_df, x="department", y="revenue", color="department", title="💰 Revenue by Department")
+    fig.update_layout(width=1100, height=500, margin=dict(t=60, b=40))
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     fraud_df = df.groupby("region_group")["is_fraud"].mean().reset_index()
     fig = px.bar(fraud_df, x="region_group", y="is_fraud", title="⚠️ Fraud Percentage by Region")
     fig.update_yaxes(tickformat=".1%")
+    fig.update_layout(width=1100, height=500, margin=dict(t=60, b=40))
     st.plotly_chart(fig, use_container_width=True)
 
 with tab3:
     month_df = df.groupby("order_month")["revenue"].sum().reset_index()
     fig = px.line(month_df, x="order_month", y="revenue", markers=True, title="📈 Monthly Revenue Trend")
+    fig.update_layout(width=1100, height=500, margin=dict(t=60, b=40))
     st.plotly_chart(fig, use_container_width=True)
 
 # --- Fraud Heatmap ---
@@ -139,9 +142,15 @@ fig = go.Figure(data=go.Heatmap(
     x=heatmap_pivot.columns,
     y=heatmap_pivot.index,
     colorscale="Reds",
-    colorbar=dict(title="Fraud Rate")
+    colorbar=dict(title="Fraud Rate"),
+    hoverongaps=False
 ))
-fig.update_layout(title="🧊 Fraud Rate Heatmap (Dept vs Region)")
+fig.update_layout(
+    title="🧊 Fraud Rate Heatmap (Dept vs Region)",
+    width=1100,
+    height=500,
+    margin=dict(t=60, b=40)
+)
 st.plotly_chart(fig, use_container_width=True)
 
 # --- Data Preview ---
