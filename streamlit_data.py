@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from openai import OpenAI
+import openai  # ✅ Correct import for openai>=1.x
 from databricks import sql
 import plotly.express as px
 import plotly.graph_objects as go
@@ -12,7 +12,7 @@ HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
 # --- Set up OpenAI client ---
-client = OpenAI(api_key=openai_api_key)
+openai.api_key = openai_api_key  # ✅ Correct way for v1.x
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -34,7 +34,7 @@ def query_databricks(query):
 # --- GPT Fraud Insight Generator ---
 def ask_gpt(prompt):
     try:
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a top fraud detection analyst for a retail company."},
