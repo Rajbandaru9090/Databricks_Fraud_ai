@@ -136,22 +136,26 @@ with tab3:
 # --- Fraud Heatmap ---
 st.subheader("🌡️ Department-wise Fraud Heatmap")
 heatmap_df = df.groupby(["department", "region_group"]).agg(fraud_rate=("is_fraud", "mean")).reset_index()
-heatmap_pivot = heatmap_df.pivot(index="department", columns="region_group", values="fraud_rate")
-fig = go.Figure(data=go.Heatmap(
-    z=heatmap_pivot.values,
-    x=heatmap_pivot.columns,
-    y=heatmap_pivot.index,
-    colorscale="Reds",
-    colorbar=dict(title="Fraud Rate"),
-    hoverongaps=False
-))
-fig.update_layout(
-    title="🧊 Fraud Rate Heatmap (Dept vs Region)",
-    width=1100,
-    height=500,
-    margin=dict(t=60, b=40)
-)
-st.plotly_chart(fig, use_container_width=True)
+
+if heatmap_df.empty:
+    st.warning("No data available to generate heatmap.")
+else:
+    heatmap_pivot = heatmap_df.pivot(index="department", columns="region_group", values="fraud_rate").fillna(0)
+    fig = go.Figure(data=go.Heatmap(
+        z=heatmap_pivot.values,
+        x=heatmap_pivot.columns,
+        y=heatmap_pivot.index,
+        colorscale="Reds",
+        colorbar=dict(title="Fraud Rate"),
+        hoverongaps=False
+    ))
+    fig.update_layout(
+        title="🧊 Fraud Rate Heatmap (Dept vs Region)",
+        width=1100,
+        height=500,
+        margin=dict(t=60, b=40)
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 # --- Data Preview ---
 st.subheader("📋 Sample of Filtered Data")
