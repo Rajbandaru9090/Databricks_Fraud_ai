@@ -4,7 +4,7 @@
  It enables deep insights into sales performance, fraud detection, and region-wise trends — all controlled through a smart natural language assistant.
 
 ### 
-🌐 [Live Demo App](https://your-streamlit-link.com) &nbsp;|&nbsp; 
+🌐 [Live Demo App](https://databricksfraudai-eabvl6ka4zbnpwegezffec.streamlit.app/) &nbsp;|&nbsp; 
 📽️ [Demo Video](https://your-loom-link.com) &nbsp;|&nbsp; 
 📊 [Dataset: Instacart 3M Orders](https://www.instacart.com/datasets/grocery-orders)
 
