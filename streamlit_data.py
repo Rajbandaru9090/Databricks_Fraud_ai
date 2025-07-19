@@ -3,8 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from databricks import sql
-from openai import OpenAI
-import os
+import openai
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
@@ -12,12 +11,8 @@ DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
-
-client = OpenAI(
-    api_key=openai_api_key,
-    timeout=30.0
-)
-
+# --- Set OpenAI API Key ---
+openai.api_key = openai_api_key
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -39,7 +34,7 @@ def query_databricks(query):
 # --- GPT Insight Function ---
 def ask_gpt(prompt):
     try:
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a top fraud detection analyst for a retail company."},
