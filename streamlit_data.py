@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from databricks import sql
-import openai
+from openai import OpenAI
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
@@ -11,8 +11,8 @@ DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
-# --- Set OpenAI API Key ---
-openai.api_key = openai_api_key
+# --- Set up OpenAI Client (openai>=1.0.0 compatible) ---
+client = OpenAI(api_key=openai_api_key)
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -34,7 +34,7 @@ def query_databricks(query):
 # --- GPT Insight Function ---
 def ask_gpt(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a top fraud detection analyst for a retail company."},
@@ -79,7 +79,7 @@ if category != "All":
 if filters:
     query += " WHERE " + " AND ".join(filters)
 
-# --- Load Data from Databricks ---
+# --- Load Data ---
 df = query_databricks(query)
 
 # --- Data Validity Check ---
@@ -134,10 +134,9 @@ with tab3:
     fig.update_layout(width=1100, height=500, margin=dict(t=60, b=40))
     st.plotly_chart(fig, use_container_width=True)
 
-# --- Fraud Heatmap ---
+# --- Heatmap ---
 st.subheader("🌡️ Department-wise Fraud Heatmap")
 heatmap_df = df.groupby(["department", "region_group"]).agg(fraud_rate=("is_fraud", "mean")).reset_index()
-
 if heatmap_df.empty:
     st.warning("No data available to generate heatmap.")
 else:
