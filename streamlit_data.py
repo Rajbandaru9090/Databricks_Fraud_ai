@@ -3,13 +3,13 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from databricks import sql
-import openai  # using the global openai instance (not OpenAI class)
+import openai
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
 DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
-openai.api_key = st.secrets["openai_api_key"]  # ✅ safest and recommended for Streamlit
+openai.api_key = st.secrets["openai_api_key"]  # ✅ Correct usage
 
 # --- Databricks Query Function ---
 def query_databricks(query):
