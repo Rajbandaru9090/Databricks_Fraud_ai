@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-import openai
-from databricks import sql
 import plotly.express as px
 import plotly.graph_objects as go
+from databricks import sql
+from openai import OpenAI
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
@@ -11,8 +11,8 @@ DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
-# --- Set up OpenAI client ---
-openai.api_key = openai_api_key
+# --- Set up OpenAI Client ---
+client = OpenAI(api_key=openai_api_key)
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -31,10 +31,10 @@ def query_databricks(query):
         st.error(f"❌ Error querying Databricks: {e}")
         return pd.DataFrame()
 
-
+# --- GPT Insight Function ---
 def ask_gpt(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a top fraud detection analyst for a retail company."},
@@ -43,18 +43,19 @@ def ask_gpt(prompt):
             temperature=0.3,
             max_tokens=300,
         )
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
     except Exception as e:
         return f"❌ GPT error: {e}"
 
 # --- UI Setup ---
 st.set_page_config(layout="wide", page_title="RetailX - Fraud Detection AI Dashboard")
 st.title("🔥 RetailX: AI-Powered Fraud Detection & Revenue Intelligence")
+
 st.markdown("""
 <style>
-    .big-font { font-size:20px !important; font-weight: 600; }
-    .metric { font-size: 18px; font-weight: bold; }
-    .stPlotlyChart { padding-bottom: 20px; }
+.big-font { font-size:20px !important; font-weight: 600; }
+.metric { font-size: 18px; font-weight: bold; }
+.stPlotlyChart { padding-bottom: 20px; }
 </style>
 """, unsafe_allow_html=True)
 st.markdown("---")
@@ -86,7 +87,7 @@ if df.empty:
     st.warning("⚠️ No data found with current filters.")
     st.stop()
 
-# --- KPI Section ---
+# --- KPI Metrics ---
 st.markdown("## 🚀 Key Performance Metrics")
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Orders", f"{df['order_id'].nunique():,}")
@@ -110,7 +111,7 @@ Give data-driven fraud insights and highlight anomalies in regions, time periods
     st.markdown(f"**🤖 GPT Insight:** {answer}")
 st.markdown("---")
 
-# --- Advanced Visuals ---
+# --- Visualizations ---
 st.subheader("📊 Revenue vs Fraud Overview")
 tab1, tab2, tab3 = st.tabs(["Revenue by Department", "Fraud % by Region", "Monthly Trends"])
 
