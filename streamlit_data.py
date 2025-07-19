@@ -31,10 +31,10 @@ def query_databricks(query):
         st.error(f"❌ Error querying Databricks: {e}")
         return pd.DataFrame()
 
-# --- GPT Fraud Insight Generator ---
+
 def ask_gpt(prompt):
     try:
-        response = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a top fraud detection analyst for a retail company."},
@@ -43,7 +43,7 @@ def ask_gpt(prompt):
             temperature=0.3,
             max_tokens=300,
         )
-        return response.choices[0].message.content
+        return response.choices[0].message["content"]
     except Exception as e:
         return f"❌ GPT error: {e}"
 
