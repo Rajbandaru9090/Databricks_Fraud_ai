@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from databricks import sql
 from openai import OpenAI
+import os
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
@@ -11,8 +12,10 @@ DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
-# --- Set up OpenAI Client ---
-client = OpenAI(api_key=openai_api_key)
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+client = OpenAI()
+
 
 # --- Databricks Query Function ---
 def query_databricks(query):
