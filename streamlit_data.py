@@ -13,8 +13,10 @@ HTTP_PATH = st.secrets["http_path"]
 openai_api_key = st.secrets["openai_api_key"]
 
 
-os.environ["OPENAI_API_KEY"] = openai_api_key
-client = OpenAI()
+client = OpenAI(
+    api_key=openai_api_key,
+    timeout=30.0
+)
 
 
 # --- Databricks Query Function ---
