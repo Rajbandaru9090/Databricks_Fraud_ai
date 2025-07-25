@@ -17,7 +17,7 @@
 - **Sales Dashboards**: Analyze performance by region, department, and time period
 - **Dynamic Filters**: Region, Date Range, Category, Fraud Level
 - **Large-Scale Analytics**: Processes 3M+ orders using Apache Spark on Databricks
-- **AI Skill Matching (Coming Soon)**: Personalized GPT insights on risk/fraud scoring
+- **AI Skill Matching**: Personalized GPT insights on risk/fraud scoring
 - **Modern UI**: Clean, responsive, interactive with visual clarity
 
 ---
