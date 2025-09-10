@@ -1,18 +1,15 @@
 import streamlit as st
 import pandas as pd
-import openai
-from databricks import sql
 import plotly.express as px
 import plotly.graph_objects as go
+from databricks import sql
+import openai  # using the global openai instance (not OpenAI class)
 
 # --- Load Secrets ---
 DATABRICKS_HOST = st.secrets["databricks_host"]
 DATABRICKS_TOKEN = st.secrets["databricks_token"]
 HTTP_PATH = st.secrets["http_path"]
-openai_api_key = st.secrets["openai_api_key"]
-
-# --- Set up OpenAI client ---
-openai.api_key = openai_api_key
+openai.api_key = st.secrets["openai_api_key"]  # ✅ safest and recommended for Streamlit
 
 # --- Databricks Query Function ---
 def query_databricks(query):
@@ -31,7 +28,7 @@ def query_databricks(query):
         st.error(f"❌ Error querying Databricks: {e}")
         return pd.DataFrame()
 
-# --- GPT Fraud Insight Generator ---
+# --- GPT Insight Function ---
 def ask_gpt(prompt):
     try:
         response = openai.chat.completions.create(
@@ -50,11 +47,12 @@ def ask_gpt(prompt):
 # --- UI Setup ---
 st.set_page_config(layout="wide", page_title="RetailX - Fraud Detection AI Dashboard")
 st.title("🔥 RetailX: AI-Powered Fraud Detection & Revenue Intelligence")
+
 st.markdown("""
 <style>
-    .big-font { font-size:20px !important; font-weight: 600; }
-    .metric { font-size: 18px; font-weight: bold; }
-    .stPlotlyChart { padding-bottom: 20px; }
+.big-font { font-size:20px !important; font-weight: 600; }
+.metric { font-size: 18px; font-weight: bold; }
+.stPlotlyChart { padding-bottom: 20px; }
 </style>
 """, unsafe_allow_html=True)
 st.markdown("---")
@@ -78,7 +76,7 @@ if category != "All":
 if filters:
     query += " WHERE " + " AND ".join(filters)
 
-# --- Load Data from Databricks ---
+# --- Load Data ---
 df = query_databricks(query)
 
 # --- Data Validity Check ---
@@ -86,7 +84,7 @@ if df.empty:
     st.warning("⚠️ No data found with current filters.")
     st.stop()
 
-# --- KPI Section ---
+# --- KPI Metrics ---
 st.markdown("## 🚀 Key Performance Metrics")
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Orders", f"{df['order_id'].nunique():,}")
@@ -110,7 +108,7 @@ Give data-driven fraud insights and highlight anomalies in regions, time periods
     st.markdown(f"**🤖 GPT Insight:** {answer}")
 st.markdown("---")
 
-# --- Advanced Visuals ---
+# --- Visualizations ---
 st.subheader("📊 Revenue vs Fraud Overview")
 tab1, tab2, tab3 = st.tabs(["Revenue by Department", "Fraud % by Region", "Monthly Trends"])
 
@@ -133,10 +131,9 @@ with tab3:
     fig.update_layout(width=1100, height=500, margin=dict(t=60, b=40))
     st.plotly_chart(fig, use_container_width=True)
 
-# --- Fraud Heatmap ---
+# --- Heatmap ---
 st.subheader("🌡️ Department-wise Fraud Heatmap")
 heatmap_df = df.groupby(["department", "region_group"]).agg(fraud_rate=("is_fraud", "mean")).reset_index()
-
 if heatmap_df.empty:
     st.warning("No data available to generate heatmap.")
 else:
